@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-const ethers = require("ethers")
+  
+import { ethers } from "ethers";// Import ethers from the correct location
 
 // Replace with your contract address
-const contractAddress = 'YOUR_CONTRACT_ADDRESS';
+const contractAddress = '0x19245c96E1Ada2F28d55099A7ebBd1452434c770';
 
 const MainClaim = ({ accounts, setAccounts }) => {
   const [claiming, setClaiming] = useState(false);
@@ -10,20 +11,30 @@ const MainClaim = ({ accounts, setAccounts }) => {
   const handleClaim = async () => {
     try {
       setClaiming(true);
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await window.ethereum.enable(); 
 
-      const signer = provider.getSigner();
+      if (window.ethereum) {
+        console.log('Ethereum provider is available.');
 
-      const contract = new ethers.Contract(contractAddress, [], signer);
+        // Request account access using eth_requestAccounts
+        const accounts = await window.ethereum.request({
+          method: 'eth_requestAccounts',
+        });
 
-      // Call the mint function
-      const transaction = await contract.mint();
+        // Set the connected accounts
+        setAccounts(accounts);
 
-      await transaction.wait();
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, [], signer);
+
+        // Call the mint function
+        const transaction = await contract.mint();
+        await transaction.wait();
+      } else {
+        console.error('Ethereum provider not found.');
+      }
 
       setClaiming(false);
-    
     } catch (error) {
       console.error('Error claiming:', error);
       setClaiming(false);
@@ -58,5 +69,3 @@ const MainClaim = ({ accounts, setAccounts }) => {
 };
 
 export default MainClaim;
-
-
