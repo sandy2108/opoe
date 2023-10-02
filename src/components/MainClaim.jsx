@@ -25,7 +25,13 @@ const MainClaim = ({ accounts, setAccounts }) => {
 
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
-        const contract = new ethers.Contract(contractAddress, [], signer);
+        const contract = new ethers.Contract(contractAddress, [{
+          "inputs": [],
+          "name": "mint",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }], signer);
 
         // Call the mint function
         const transaction = await contract.mint();
